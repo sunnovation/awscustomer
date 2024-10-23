@@ -3,10 +3,13 @@ package com.customer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class CutomerController {
@@ -25,6 +28,32 @@ public class CutomerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/defaultCustomers")
+    public ResponseEntity<HashMap<String,Object>> defaultCustomers(){
+        HashMap<String,Object> response=new HashMap<>();
+        response.put("code", 200);
+        response.put("payload", customers().stream().sorted((c1,c2)-> (int) (c1.getCustomerId()- c2.getCustomerId())).collect(Collectors.toUnmodifiableList()));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping("/descCustomers")
+    public ResponseEntity<HashMap<String,Object>> descCustomers(){
+        HashMap<String,Object> response=new HashMap<>();
+        response.put("code", 200);
+        response.put("payload", customers().stream().sorted((c1,c2)-> (int) (c2.getCustomerId()- c1.getCustomerId())).collect(Collectors.toUnmodifiableList()));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/filterAddress")
+    public ResponseEntity<HashMap<String,Object>> descCustomers(@RequestParam String filter){
+        HashMap<String,Object> response=new HashMap<>();
+        response.put("code", 200);
+        response.put("payload",
+                customers().stream().
+                filter(customer -> customer.getAddress().equalsIgnoreCase(filter))
+                        .sorted((c1,c2)-> (int) (c2.getCustomerId()- c1.getCustomerId()))
+                .collect(Collectors.toUnmodifiableList()));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     private List<Customer> customers(){
 
         return List.of(
