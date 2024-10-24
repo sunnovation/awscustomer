@@ -54,6 +54,23 @@ public class CutomerController {
                 .collect(Collectors.toUnmodifiableList()));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @GetMapping("/filterAddressWithNumber")
+    public ResponseEntity<HashMap<String,Object>> descCustomersWithNumber(@RequestParam String filter){
+        HashMap<String,Object> response=new HashMap<>();
+        response.put("code", 200);
+        response.put("payload",
+                customers().stream().
+                        filter(customer -> customer.getAddress().equalsIgnoreCase(filter))
+                        .sorted((c1,c2)-> (int) (c2.getCustomerId()- c1.getCustomerId()))
+                        .collect(Collectors.groupingBy(Customer::getAddress, Collectors.counting())));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+
+
     private List<Customer> customers(){
 
         return List.of(
